@@ -82,6 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="form-link">
                 <a href="reset_password.php">Wachtwoord Vergeten?</a>
             </div>
+            
+            <div class="form-link">
+                <a href="register.php">Nog geen account? Registreren</a>
+            </div>
         </div>
     </main>
     
