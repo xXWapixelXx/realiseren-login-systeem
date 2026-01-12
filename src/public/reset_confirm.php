@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $valid_link) {
         $db = new Database();
         $db->query("UPDATE password_resets SET used = 1 WHERE user_id = ? AND hash = ?", [$user_id, $hash]);
         
-        $succesmelding = 'Je wachtwoord is gewijzigd. Je kunt nu <a href="login.php" style="color: #f41313;">inloggen</a> met je nieuwe wachtwoord.';
+        $succesmelding = 'Je wachtwoord is ged. Je kunt nu <a href="login.php" style="color: #f41313;">inloggen</a> met je nieuwe wachtwoord.';
         $valid_link = false;
     }
 }
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $valid_link) {
                     </div>
                     
                     <div class="buttons">
-                        <button type="submit">[WIJZIGEN]</button>
+                        <button type="submit">WIJZIGEN</button>
                     </div>
                 </form>
             <?php endif; ?>
