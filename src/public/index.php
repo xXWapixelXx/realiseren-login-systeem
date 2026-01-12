@@ -10,32 +10,24 @@
 session_start();
 require_once __DIR__ . '/../classes/Database.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
+$is_ingelogd = isset($_SESSION['user_id']);
 
 $db = new Database();
 $stmt = $db->query("SELECT * FROM movie ORDER BY id DESC");
 $videos = $stmt->fetchAll();
 
-$geselecteerde_video = null;
-if (isset($_GET['preview']) && $_GET['preview'] != '') {
-    $stmt = $db->query("SELECT * FROM movie WHERE id = ?", [$_GET['preview']]);
-    $geselecteerde_video = $stmt->fetch();
-}
-
-if (!$geselecteerde_video && count($videos) > 0) {
-    $geselecteerde_video = $videos[0];
+$eerste_video = null;
+if (count($videos) > 0) {
+    $eerste_video = $videos[0];
 }
 
 $youtube_id = '';
-if ($geselecteerde_video) {
-    if (strpos($geselecteerde_video['url'], 'youtube.com/watch?v=') !== false) {
-        $parts = explode('v=', $geselecteerde_video['url']);
+if ($eerste_video) {
+    if (strpos($eerste_video['url'], 'youtube.com/watch?v=') !== false) {
+        $parts = explode('v=', $eerste_video['url']);
         $youtube_id = explode('&', $parts[1])[0];
-    } elseif (strpos($geselecteerde_video['url'], 'youtu.be/') !== false) {
-        $parts = explode('youtu.be/', $geselecteerde_video['url']);
+    } elseif (strpos($eerste_video['url'], 'youtu.be/') !== false) {
+        $parts = explode('youtu.be/', $eerste_video['url']);
         $youtube_id = explode('?', $parts[1])[0];
     }
 }
@@ -141,19 +133,23 @@ if ($geselecteerde_video) {
         </div>
         <nav>
             <a href="index.php">Video's</a>
-            <?php if ($_SESSION['is_admin'] == 1): ?>
+            <?php if ($is_ingelogd && $_SESSION['is_admin'] == 1): ?>
                 <a href="beheer.php">Beheer</a>
             <?php endif; ?>
-            <a href="logout.php">Uitloggen</a>
+            <?php if ($is_ingelogd): ?>
+                <a href="logout.php">Uitloggen</a>
+            <?php else: ?>
+                <a href="login.php">Inloggen</a>
+            <?php endif; ?>
         </nav>
     </header>
     
-    <?php if ($geselecteerde_video): ?>
+    <?php if ($eerste_video): ?>
     <div class="preview">
         <div class="preview-info">
-            <h2><?php echo $geselecteerde_video['title']; ?></h2>
-            <p class="year"><?php echo $geselecteerde_video['year']; ?></p>
-            <p class="description"><?php echo $geselecteerde_video['description']; ?></p>
+            <h2><?php echo $eerste_video['title']; ?></h2>
+            <p class="year"><?php echo $eerste_video['year']; ?></p>
+            <p class="description"><?php echo $eerste_video['description']; ?></p>
         </div>
         <div class="preview-player">
             <iframe src="https://www.youtube.com/embed/<?php echo $youtube_id; ?>" allowfullscreen></iframe>
@@ -165,8 +161,8 @@ if ($geselecteerde_video) {
         <?php if (count($videos) > 0): ?>
             <div class="videos">
                 <?php foreach ($videos as $video): ?>
-                    <div class="video-card <?php if ($geselecteerde_video && $video['id'] == $geselecteerde_video['id']) echo 'actief'; ?>">
-                        <a href="index.php?preview=<?php echo $video['id']; ?>">
+                    <div class="video-card">
+                        <a href="video.php?id=<?php echo $video['id']; ?>">
                             <img src="<?php echo $video['cover_url']; ?>" alt="<?php echo $video['title']; ?>">
                         </a>
                     </div>
